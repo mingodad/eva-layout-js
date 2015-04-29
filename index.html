@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<!--
+ EvaLayoutManager without third party dependencies.
+ Originally derived from 
+ EvaLayout, Lay it be! 
+ (http://www.codeproject.com/Articles/13891/EvaLayout-Lay-it-be)
+ Copyright (c) 2014, Domingo Alvarez Duarte - mingodad[at]gmail[dot]com
+ 
+ Released under the MIT LICENSE or GNU LESSER GENERAL PUBLIC LICENSE  Version 3
+ at your choice, permission to release under this licenses was obtained from the
+ original author Alejandro Xalabarder ales[at]elxala[dot]de
+-->
+<html>
+	<head>
+		<title>TODO supply a title</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width">
+		<!--<link rel="text/css" href="normalize.css">-->
+		<style type="text/css">
+			/* box-sizing is needed to make calculation easy */
+			* {-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
+			input[type="text"] {width:8em;} /*fix for firefox*/
+			label {white-space: nowrap;}
+			.ease-out {transition: transform 500ms ease-out;} 
+			.ease-in {transition: transform 500ms ease-in;} 
+		</style>
+		<script type="text/javascript" src="EvaLayoutManager.js"></script>
+		<script type="text/javascript" src="drag-resize.js"></script>
+		<script type="text/javascript">
+			function doDesign(bVal)
+			{
+				if(bVal)
+				{
+					dad.addEvent(window, "mousemove", dragResizeOnMouseOver);
+				} else {
+					dad.removeEvent(window, "mousemove", dragResizeOnMouseOver);
+				}
+			}
+
+			function getElementIds(elm, ary)
+			{
+				var children = elm.children;
+				if(children)
+				{
+					for(var i=0, len=children.length; i<len; ++i)
+					{
+						var theChild = children[i];
+						var theId = theChild.id;
+						if(theId && (typeof theId === "string"))
+						{
+							//console.log(theId);
+							ary.push(theId);
+						}
+						getElementIds(theChild, ary);
+					}
+				}
+			}
+
+			function doSetSize()
+			{
+				var elm = document.getElementById('set-size');
+				if(elm)
+				{
+					var rec = elm.value.split('x');
+					if(rec.length === 2)
+					{
+						myLayoutManager.doLayout(parseInt(rec[0]), parseInt(rec[1]));
+					}
+				}
+				return false;
+			}
+
+			function doSwapSize()
+			{
+				var elm = document.getElementById('set-size');
+				if(elm)
+				{
+					var rec = elm.value.split('x');
+					if(rec.length === 2)
+					{
+						myLayoutManager.doLayout(parseInt(rec[1]), parseInt(rec[0]));
+						elm.value = rec[1] + 'x' + rec[0];
+					}
+				}
+				return false;	
+			}
+
+
+			var myLayoutManager = new MyEvaLayoutManager();
+
+			var layInfo1 = function(){/*
+				EvaLayout, 10, 10, 5, 5
+				grid , A          , X3        , A             , X            , X               , A
+				A    , roid       , roname    , -             , -            , -               , romdate
+				A    , lname      , name      , -             , -            , -               , -
+				A    , lcompany   , company   , -             , -            , -               , -
+				A    , laddress   , address   , -             , -            , -               , -
+				A    , lzip_code  , zip_code  , lcity         , city         , -               , -
+				A    , lstate     , state     , lcountry      , country      , -               , -
+				A    , ltax_number, tax_number, lshow_on_sales, lshow_on_buys, lis_active      , -
+				A    , lphone     , phone     , lfax          , fax          , luse_sales_tax2 , -
+				A    , lemail(min-size:12em;)     , email     , -             , -            ,lsales_tax_exempt, -
+				A    , lweb       , web       , -             , lgps         , gps             , -
+				A    , lcontact   , contact   , -             , -            , -               , -
+				X    , lnotes     , notes     , -             , -            , -               , -
+			*/}.toString().slice(14,-3);
+
+			var layInfo2 = function(){/*
+				EvaLayout, 10, 10, 5, 5
+				grid , A              , X          , A               , X
+				A    , lname          , -          , -               , -
+				A    , name           , -          , -               , -
+				A    , lcompany       , -          , -               , -
+				A    , company        , -          , -               , -
+				A    , laddress       , -          , -               , -
+				A    , address        , -          , -               , -
+				A    , lzip_code      , zip_code   , lgps            , gps
+				A    , lcity          , city       , lstate          , state
+				A    , lcountry       , country    , -               , -
+				A    , ltax_number    , tax_number , lis_active      , -
+				A    , lshow_on_sales , -          , lshow_on_buys   , -
+				A    , luse_sales_tax2, -          ,lsales_tax_exempt, -
+				A    , lphone         , phone      , lfax            ,fax
+				A    , lemail         , email      , -               , -
+				A    , lweb           , web        , -               , -
+				A    , lcontact       , contact    , -               , -
+				A    , lnotes         , -          , -               , -
+				X    , notes          , -          , -               , -
+			*/}.toString().slice(14,-3);
+
+			var layInfo3 = function(){/*
+				EvaLayout, 10, 10, 5, 5
+				grid , A              , X          , A 
+				A    , lname          , -          , -
+				A    , name           , -          , -
+				A    , lcompany       , -          , -
+				A    , company        , -          , -
+				A    , laddress       , -          , -
+				A    , address        , -          , -
+				A    , lzip_code      , zip_code   , -
+				A    , lgps           , gps        , -
+				A    , lcity          , city       , -
+				A    , lstate         , state      , -
+				A    , lcountry       , country    , -
+				A    , ltax_number    , tax_number , lis_active
+				A    , lshow_on_sales , -          , lshow_on_buys
+				A    , luse_sales_tax2, -          ,lsales_tax_exempt
+				A    , lphone         , phone      , -
+				A    , lfax            ,fax        , -
+				A    , lemail         , email      , -
+				A    , lweb           , web        , -
+				A    , lcontact       , contact    , -
+				A    , lnotes         , -          , -
+				X    , notes          , -          , -
+			*/}.toString().slice(14,-3);
+
+			function doSetLayout(layout)
+			{
+				switch(layout)
+				{
+					case 0: myLayoutManager.setLayout(layInfo1);break;
+					case 1: myLayoutManager.setLayout(layInfo2);break;
+					case 2: myLayoutManager.setLayout(layInfo3);break;
+				}
+				myLayoutManager.hideShowComponentsInLayout();
+				doSetSize();
+			}
+
+			window.onload = function()
+			{
+				var myIds = ["roid", "roname", "romdate", "lname", "name", "lcompany", "company", 
+					"laddress", "address", "lzip_code", "zip_code", "lcity", "city", 
+					"lstate", "state", "lcountry", "country", "ltax_number", "tax_number", 
+					"lshow_on_sales", "lshow_on_buys", "lis_active", "lphone", "phone", 
+					"lfax", "fax", "luse_sales_tax2", "lemail", "email", "lsales_tax_exempt", 
+					"lgps", "gps", "lweb", "web", "lcontact", "contact", "lnotes", "notes"];
+				for(var i=0, len=myIds.length; i<len; ++i)
+				{
+					var theId = myIds[i];
+					myLayoutManager.addComponent(theId, theId);
+				}
+
+				doSetLayout(0);
+				//console.log(myLayoutManager.nRows(), myLayoutManager.nColumns());
+				//myLayoutManager.doLayout(800, 600);
+			};
+
+			var resizeTimer = null;
+			function windowResized(event)
+			{
+			    if(resizeTimer){
+				clearTimeout(resizeTimer);
+			    }
+			    resizeTimer = setTimeout(function() {
+				var elm = document.getElementById('set-size');
+				var rec = elm.value.split('x');
+				if(rec.length === 2)
+				{
+					rec[1] = document.body.offsetWidth - 20;
+					myLayoutManager.doLayout(rec[1], parseInt(rec[0]));
+					elm.value = rec[1] + 'x' + rec[0];
+				}
+				resizeTimer = null;
+				}, 200);
+			}
+		</script>
+	</head>
+	<body onresize2="windowResized(event)">
+		<form name="settings" onsubmit="false">
+			<select onchange="this.form.setsize.value = this.options[this.selectedIndex].text;">
+				<option>800x600</option>
+				<option>320x320</option>
+				<option>320x480</option>
+				<option>360x640</option>
+				<option>700x500</option>
+			</select>
+			<button onclick="return doSetSize();">Set size (WxH)</button>
+			<input name="setsize" id="set-size" value="800x600">
+			<button onclick="return doSwapSize();">Swap size (HxW)</button>
+			<select onchange="doSetLayout(this.selectedIndex)">
+				<option>layoutInfo1</option>
+				<option>layoutInfo2</option>
+				<option>layoutInfo3</option>
+			</select>
+			<label><input type="checkbox" onchange="doDesign(this.checked)">Design</label>
+		</form>
+		<div style="position:relative;">
+			<form name="test" onsubmit="false">
+				<input type="text" name="id" id="roid" size="6" maxlength="6">
+				<input type="text" name="name" id="roname">
+				<input type="text" name="mdate" id="romdate">
+				<label id="lname">Name</label>
+				<input type="text" name="name" id="name">
+				<label id="lcompany">Company</label>
+				<input type="text" name="company" id="company">
+				<label id="laddress">Address</label>
+				<input type="text" name="address" id="address">
+				<label id="lzip_code">ZIP Code</label>
+				<input type="text" name="zip_code" id="zip_code">
+				<label id="lcity">City</label>
+				<input type="text" name="city" id="city">
+				<label id="lstate">State</label>
+				<input type="text" name="state" id="state">
+				<label id="lcountry">Country</label>
+				<input type="text" name="country" id="country">
+				<label id="ltax_number">Tax Number</label>
+				<input type="text" name="tax_number" id="tax_number">
+				<label id="lshow_on_sales"><input type="checkbox" name="show_on_sales">Sales</label>
+				<label id="lshow_on_buys"><input type="checkbox" name="show_on_buys">Buys</label>
+				<label id="lis_active"><input type="checkbox" name="is_active">Active</label>
+				<label id="lphone">Phone</label>
+				<input type="text" name="phone" id="phone">
+				<label id="lfax">Fax</label>
+				<input type="text" name="fax" id="fax">
+				<label id="luse_sales_tax2"><input type="checkbox" name="use_sales_tax2">Sales Tax2</label>
+				<label id="lemail">Email</label>
+				<input type="text" name="email" id="email">
+				<label id="lsales_tax_exempt"><input type="checkbox" name="sales_tax_exempt">Tax Excempt</label>
+				<label id="lweb">Web</label>
+				<input type="text" name="web" id="web">
+				<label id="lgps">GPS</label>
+				<input type="text" name="gps" id="gps">
+				<label id="lcontact">Contact</label>
+				<input type="text" name="contact" id="contact">
+				<label id="lnotes">Notes</label>
+				<textarea name="notes" id="notes"></textarea>
+			</form>
+		</div>
+	</body>
+</html>
